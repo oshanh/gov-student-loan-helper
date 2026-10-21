@@ -1,3 +1,5 @@
+import { getCompactRequirements } from '../utils/formatRequirement'
+
 const streamBadgeClass = {
     humanities: 'badge-humanities',
     management: 'badge-management',
@@ -56,10 +58,14 @@ export default function CourseCard({ course, onViewDetails, index }) {
             </div>
 
             {/* AL requirement preview */}
-            <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">
-                <span className="text-slate-300 font-medium">A/L: </span>
-                {course.alRequirement}
-            </p>
+            <ul className="text-xs text-slate-400 leading-relaxed line-clamp-3 space-y-0.5">
+                {getCompactRequirements(course).map(({ level, text }) => (
+                    <li key={`${level}-${text}`} className="flex items-start gap-1.5">
+                        <span className="text-emerald-400 shrink-0" aria-hidden="true">•</span>
+                        <span><strong className="text-slate-300 font-medium">{level}:</strong> {text}</span>
+                    </li>
+                ))}
+            </ul>
 
             {/* View details button */}
             <button

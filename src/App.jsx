@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import {
   courses,
   INSTITUTIONS,
@@ -7,52 +7,11 @@ import {
   INELIGIBILITY_CRITERIA,
   LOAN_INFORMATION,
 } from './data/courses'
-import StreamFilter from './components/StreamFilter'
-import CourseCard from './components/CourseCard'
-import CourseModal from './components/CourseModal'
 import EligibilityChecker from './components/EligibilityChecker'
 import './index.css'
 
 export default function App() {
-  const [activeStream, setActiveStream] = useState('all')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedInstitution, setSelectedInstitution] = useState('all')
-  const [selectedDuration, setSelectedDuration] = useState('all')
-  const [selectedCourse, setSelectedCourse] = useState(null)
   const [showChecker, setShowChecker] = useState(false)
-  const [eligibilityResults, setEligibilityResults] = useState(null)
-  const [bridgingInfo, setBridgingInfo] = useState(null)
-
-  const filteredCourses = useMemo(() => {
-    let list = eligibilityResults !== null ? eligibilityResults : courses
-    if (activeStream !== 'all') list = list.filter(c => c.stream === activeStream)
-    if (selectedInstitution !== 'all') list = list.filter(c => c.institution === selectedInstitution)
-    if (selectedDuration !== 'all') list = list.filter(c => c.duration === Number(selectedDuration))
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase()
-      list = list.filter(c =>
-        c.title.toLowerCase().includes(q) ||
-        c.institution.toLowerCase().includes(q) ||
-        c.alRequirement.toLowerCase().includes(q)
-      )
-    }
-    return list
-  }, [activeStream, searchQuery, selectedInstitution, selectedDuration, eligibilityResults])
-
-  const handleEligibilityResults = (matched, bridging) => {
-    setEligibilityResults(matched)
-    setBridgingInfo(bridging)
-    setShowChecker(false)
-    setActiveStream('all')
-    setSelectedInstitution('all')
-    setSelectedDuration('all')
-    setSearchQuery('')
-  }
-
-  const clearEligibility = () => {
-    setEligibilityResults(null)
-    setBridgingInfo(null)
-  }
 
   return (
     <div className="min-h-screen hero-gradient">
@@ -82,7 +41,7 @@ export default function App() {
           </h1>
 
           <p className="text-slate-400 text-base md:text-lg max-w-xl mx-auto mb-8 leading-relaxed">
-            Discover all degree programmes available under the IFSLS — filter by stream, institution, or check if <em>you qualify</em> in under a minute.
+            Discover all degree programmes available under the IFSLS, explore the course catalogue, or check if <em>you qualify</em> in under a minute.
           </p>
 
           {/* Stats */}
@@ -103,22 +62,16 @@ export default function App() {
           {/* CTA buttons */}
           <div className="flex flex-wrap gap-3 justify-center">
             <button
-              onClick={() => { setShowChecker(true); setEligibilityResults(null) }}
+              onClick={() => setShowChecker(true)}
               className="px-6 py-3 rounded-xl font-semibold text-sm bg-emerald-500 hover:bg-emerald-400 text-white transition-all shadow-lg shadow-emerald-500/20"
             >
               ✦ Check My Eligibility
             </button>
             <a
-              href="#browse"
-              className="px-6 py-3 rounded-xl font-semibold text-sm glass-card border border-slate-600 text-slate-300 hover:border-slate-400 hover:text-white transition-all"
-            >
-              Browse All Courses ↓
-            </a>
-            <a
               href="/all-courses"
               className="px-6 py-3 rounded-xl font-semibold text-sm glass-card border border-blue-500/30 text-blue-300 hover:border-blue-400 hover:text-white transition-all"
             >
-              View All Info in Table →
+              View Courses →
             </a>
           </div>
         </div>
@@ -219,108 +172,6 @@ export default function App() {
         </div>
       </section>
 
-      {/* ── BROWSE SECTION ───────────────────────────── */}
-      <section id="browse" className="max-w-7xl mx-auto px-4 pb-24">
-        {/* Section title */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-          <div>
-            <h2 className="text-2xl font-bold text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>
-              {eligibilityResults !== null ? '🎯 Your Eligible Courses' : 'Browse All Programmes'}
-            </h2>
-            <p className="text-sm text-slate-400 mt-1">
-              Showing <span className="text-emerald-400 font-semibold">{filteredCourses.length}</span> programme{filteredCourses.length !== 1 ? 's' : ''}
-              {eligibilityResults !== null && ` matching your qualifications`}
-            </p>
-          </div>
-          {eligibilityResults !== null && (
-            <div className="flex items-center gap-2">
-              <button onClick={clearEligibility} className="text-xs px-4 py-2 rounded-lg border border-slate-700 text-slate-400 hover:text-white hover:border-slate-500 transition-all">
-                ✕ Clear eligibility filter
-              </button>
-            </div>
-          )}
-        </div>
-
-        {bridgingInfo && (
-          <div className="grid md:grid-cols-2 gap-3 mb-6">
-            <div className={`rounded-xl p-4 border ${bridgingInfo.ict ? 'bg-amber-500/10 border-amber-500/30' : 'bg-emerald-500/5 border-emerald-500/20'}`}>
-              <p className="text-sm font-semibold text-slate-100">ICT bridging status</p>
-              <p className="text-xs text-slate-300 mt-1">{bridgingInfo.ict ? 'Required for ICT degrees. This route also requires at least a C pass in O/L Mathematics.' : 'Not required: your stream or A/L ICT S-or-higher pass meets the handbook condition.'}</p>
-            </div>
-            <div className={`rounded-xl p-4 border ${bridgingInfo.management ? 'bg-amber-500/10 border-amber-500/30' : 'bg-emerald-500/5 border-emerald-500/20'}`}>
-              <p className="text-sm font-semibold text-slate-100">Management bridging status</p>
-              <p className="text-xs text-slate-300 mt-1">{bridgingInfo.management ? 'Required for Management degrees unless you have Commerce or an Economics S-or-higher pass in one sitting.' : 'Not required: Commerce or an Economics S-or-higher pass meets the handbook condition.'}</p>
-            </div>
-          </div>
-        )}
-
-        {/* Filters row */}
-        <div className="flex flex-col gap-4 mb-8">
-          {/* Stream tabs */}
-          <StreamFilter activeStream={activeStream} onStreamChange={setActiveStream} />
-
-          {/* Search + secondary filters */}
-          <div className="flex flex-wrap gap-3 items-center">
-            {/* Search bar */}
-            <div className="relative flex-1 min-w-[220px]">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <input
-                type="text"
-                placeholder="Search courses or institutions…"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                className="input-glow w-full pl-9 pr-4 py-2.5 rounded-xl bg-slate-800/60 border border-slate-700 text-slate-200 text-sm placeholder-slate-500"
-              />
-            </div>
-
-            {/* Institution filter */}
-            <select
-              value={selectedInstitution}
-              onChange={e => setSelectedInstitution(e.target.value)}
-              className="input-glow px-3 py-2.5 rounded-xl bg-slate-800/60 border border-slate-700 text-slate-300 text-sm"
-            >
-              <option value="all">All Institutions</option>
-              {INSTITUTIONS.map(inst => (
-                <option key={inst} value={inst}>{inst}</option>
-              ))}
-            </select>
-
-            {/* Duration filter */}
-            <select
-              value={selectedDuration}
-              onChange={e => setSelectedDuration(e.target.value)}
-              className="input-glow px-3 py-2.5 rounded-xl bg-slate-800/60 border border-slate-700 text-slate-300 text-sm"
-            >
-              <option value="all">All Durations</option>
-              <option value="3">3 Years</option>
-              <option value="4">4 Years</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Course grid */}
-        {filteredCourses.length === 0 ? (
-          <div className="text-center py-24">
-            <p className="text-5xl mb-4">🔍</p>
-            <p className="text-slate-400 text-lg">No programmes match your filters.</p>
-            <p className="text-slate-500 text-sm mt-2">Try adjusting your search or clearing the eligibility filter.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {filteredCourses.map((course, index) => (
-              <CourseCard
-                key={course.id}
-                course={course}
-                index={index}
-                onViewDetails={setSelectedCourse}
-              />
-            ))}
-          </div>
-        )}
-      </section>
-
       {/* ── FOOTER ───────────────────────────────────── */}
       <footer className="border-t border-slate-800 py-8 px-4 text-center">
         <p className="text-xs text-slate-500">
@@ -335,14 +186,8 @@ export default function App() {
       {/* ── MODALS ───────────────────────────────────── */}
       {showChecker && (
         <EligibilityChecker
-          onResults={handleEligibilityResults}
+          onResults={() => setShowChecker(false)}
           onClose={() => setShowChecker(false)}
-        />
-      )}
-      {selectedCourse && (
-        <CourseModal
-          course={selectedCourse}
-          onClose={() => setSelectedCourse(null)}
         />
       )}
     </div>
