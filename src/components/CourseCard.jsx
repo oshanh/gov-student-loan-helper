@@ -1,79 +1,37 @@
-import { getCompactRequirements } from '../utils/formatRequirement'
+import { getRequirementLines } from '../utils/formatRequirement'
 
-const streamBadgeClass = {
-    humanities: 'badge-humanities',
-    management: 'badge-management',
-    science: 'badge-science',
-    engineering: 'badge-engineering',
-    ict: 'badge-ict',
+const streamStyles = {
+    humanities: ['badge-humanities', '📚', 'Humanities'],
+    management: ['badge-management', '💼', 'Management'],
+    science: ['badge-science', '🔬', 'Science'],
+    engineering: ['badge-engineering', '⚙️', 'Engineering'],
+    ict: ['badge-ict', '💻', 'ICT'],
 }
 
-const streamLabel = {
-    humanities: 'Humanities',
-    management: 'Management',
-    science: 'Science',
-    engineering: 'Engineering',
-    ict: 'ICT',
-}
+export default function CourseCard({ course, onViewDetails, index = 0 }) {
+    const [badgeClass, emoji, streamLabel] = streamStyles[course.stream] || ['badge-ict', '🎓', course.streamLabel || 'Programme']
+    const requirements = getRequirementLines(course)
 
-const streamEmoji = {
-    humanities: '📚',
-    management: '💼',
-    science: '🔬',
-    engineering: '⚙️',
-    ict: '💻',
-}
-
-export default function CourseCard({ course, onViewDetails, index }) {
     return (
-        <div
-            className="glass-card card-glow rounded-2xl p-5 flex flex-col gap-4 transition-all duration-300 cursor-pointer animate-fadeInUp"
-            style={{ animationDelay: `${index * 40}ms` }}
-            onClick={() => onViewDetails(course)}
-        >
-            {/* Header row */}
-            <div className="flex items-start justify-between gap-3">
-                <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-white text-sm leading-snug line-clamp-2" style={{ fontFamily: 'Outfit, sans-serif' }}>
-                        {course.title}
-                    </h3>
-                    <p className="text-xs text-slate-400 mt-1 truncate">{course.institution}</p>
-                    <p className="text-[11px] text-slate-500 mt-1">{course.courseCode} · Rs. {course.courseFee.toLocaleString()}</p>
-                </div>
-                <span className={`text-xs px-2.5 py-1 rounded-full font-medium shrink-0 ${streamBadgeClass[course.stream]}`}>
-                    {streamEmoji[course.stream]} {streamLabel[course.stream]}
-                </span>
+        <article className="glass-card card-glow rounded-2xl p-5 flex flex-col gap-4 transition-all duration-300 animate-fadeInUp" style={{ animationDelay: `${index * 40}ms` }}>
+            <div>
+                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${badgeClass}`}>{emoji} {streamLabel}</span>
+                <h2 className="font-semibold text-white text-base leading-snug mt-3">{course.title}</h2>
+                <p className="text-xs text-slate-400 mt-1">{course.institution}</p>
             </div>
-
-            {/* Duration badge */}
-            <div className="flex items-center gap-2">
-                <span className="text-xs bg-slate-800 border border-slate-700 text-slate-300 px-2.5 py-1 rounded-full">
-                    ⏱ {course.duration} Year{course.duration > 1 ? 's' : ''}
-                </span>
-                {course.minGrade === 'C' && (
-                    <span className="text-xs bg-rose-500/10 border border-rose-500/30 text-rose-300 px-2.5 py-1 rounded-full">
-                        ★ Needs Credit passes
-                    </span>
-                )}
+            <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex px-2.5 py-1 rounded-md bg-blue-500/15 border border-blue-400/40 text-blue-200 text-xs font-bold tracking-wide">{course.courseCode || 'CODE N/A'}</span>
+                <span className="text-xs bg-slate-800 border border-slate-700 text-slate-300 px-2.5 py-1 rounded-full">⏱ {course.duration} years</span>
+                <span className="text-xs text-emerald-300">Rs. {(course.courseFee || 0).toLocaleString()}</span>
             </div>
-
-            {/* AL requirement preview */}
-            <ul className="text-xs text-slate-400 leading-relaxed line-clamp-3 space-y-0.5">
-                {getCompactRequirements(course).map(({ level, text }) => (
-                    <li key={`${level}-${text}`} className="flex items-start gap-1.5">
-                        <span className="text-emerald-400 shrink-0" aria-hidden="true">•</span>
-                        <span><strong className="text-slate-300 font-medium">{level}:</strong> {text}</span>
-                    </li>
-                ))}
-            </ul>
-
-            {/* View details button */}
-            <button
-                onClick={(e) => { e.stopPropagation(); onViewDetails(course); }}
-                className="mt-auto w-full py-2 rounded-xl text-sm font-medium text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/10 hover:border-emerald-400 transition-all duration-200"
-            >
-                View Full Requirements →
-            </button>
-        </div>
+            <div className="border-t border-slate-800 pt-3">
+                <p className="text-[11px] uppercase tracking-wider font-semibold text-slate-500 mb-2">Entry requirements</p>
+                <ul className="space-y-1.5 text-xs text-slate-300 leading-relaxed">
+                    {requirements.slice(0, 3).map((line, requirementIndex) => <li key={`${course.id}-requirement-${requirementIndex}`} className="flex items-start gap-2"><span className="text-emerald-400 shrink-0" aria-hidden="true">•</span><span>{line}</span></li>)}
+                </ul>
+                {requirements.length > 3 && <p className="text-[11px] text-slate-500 mt-2">+ {requirements.length - 3} more requirement{requirements.length - 3 === 1 ? '' : 's'}</p>}
+            </div>
+            <button type="button" onClick={() => onViewDetails(course)} className="mt-auto w-full py-2.5 rounded-xl text-sm font-medium text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/10 hover:border-emerald-400 transition-all">View full requirements →</button>
+        </article>
     )
 }

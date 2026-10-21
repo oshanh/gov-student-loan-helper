@@ -1,18 +1,15 @@
-import { useState } from 'react'
 import {
   courses,
   INSTITUTIONS,
+  GENERAL_REQUIREMENTS,
   BRIDGING_COURSES,
   BRIDGING_INSTITUTES,
   INELIGIBILITY_CRITERIA,
   LOAN_INFORMATION,
 } from './data/courses'
-import EligibilityChecker from './components/EligibilityChecker'
 import './index.css'
 
 export default function App() {
-  const [showChecker, setShowChecker] = useState(false)
-
   return (
     <div className="min-h-screen hero-gradient">
       {/* ── HERO ────────────────────────────────────── */}
@@ -61,12 +58,12 @@ export default function App() {
 
           {/* CTA buttons */}
           <div className="flex flex-wrap gap-3 justify-center">
-            <button
-              onClick={() => setShowChecker(true)}
+            <a
+              href="/eligibility"
               className="px-6 py-3 rounded-xl font-semibold text-sm bg-emerald-500 hover:bg-emerald-400 text-white transition-all shadow-lg shadow-emerald-500/20"
             >
               ✦ Check My Eligibility
-            </button>
+            </a>
             <a
               href="/all-courses"
               className="px-6 py-3 rounded-xl font-semibold text-sm glass-card border border-blue-500/30 text-blue-300 hover:border-blue-400 hover:text-white transition-all"
@@ -83,17 +80,11 @@ export default function App() {
           <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4" style={{ fontFamily: 'Outfit, sans-serif' }}>
             📋 General Eligibility Requirements (All Programmes)
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {[
-            { icon: '📅', title: 'A/L Year & passes', desc: '2023, 2024 or 2025; S passes in all 3 subjects in one sitting (maximum 3 sittings)' },
-              { icon: '📊', title: 'Common General Test', desc: 'Minimum 30 marks' },
-              { icon: '🇬🇧', title: 'English', desc: 'S pass at A/L General English OR O/L English' },
-              { icon: '🎂', title: 'Age Limit', desc: '25 years or below by 27 Sep 2026' },
-            ].map(req => (
-              <div key={req.title} className="bg-slate-800/40 rounded-xl p-3 border border-slate-700/50">
-                <div className="text-xl mb-1">{req.icon}</div>
-                <p className="text-xs font-semibold text-slate-200 mb-1">{req.title}</p>
-                <p className="text-xs text-slate-400 leading-relaxed">{req.desc}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {GENERAL_REQUIREMENTS.map((requirement, index) => (
+              <div key={requirement} className="bg-slate-800/40 rounded-xl p-3 border border-slate-700/50">
+                
+                <p className="text-xs text-slate-200 leading-relaxed">{requirement}</p>
               </div>
             ))}
           </div>
@@ -183,13 +174,6 @@ export default function App() {
         </a>
       </footer>
 
-      {/* ── MODALS ───────────────────────────────────── */}
-      {showChecker && (
-        <EligibilityChecker
-          onResults={() => setShowChecker(false)}
-          onClose={() => setShowChecker(false)}
-        />
-      )}
     </div>
   )
 }

@@ -25,13 +25,21 @@ function shortenRequirementText(text) {
         .trim()
 }
 
-export function getCompactRequirements(course) {
-    const requirement = course.requirement || course.alRequirement
-
+export function getRequirementLines(course) {
+    const requirement = course.requirement || course.alRequirement || ''
     if (!requirement) return []
 
     return requirement
-        .split(/\s+(?:&|and)\s+(?=(?:minimum|min\.|six|at least))/i)
+        .replace(/\r\n?/g, '\n')
+        .split('\n')
+        .flatMap(line => line.trim().split(/\s+(?=\d+\.\s)/))
+        .map(line => line.replace(/\s+/g, ' ').trim())
+        .filter(Boolean)
+}
+
+export function getCompactRequirements(course) {
+    return getRequirementLines(course)
+        .flatMap(line => line.split(/\s+(?:&|and)\s+(?=(?:minimum|min\.|six|at least))/i))
         .map(shortenRequirementText)
         .filter(Boolean)
         .map(text => ({
