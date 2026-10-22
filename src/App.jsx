@@ -81,7 +81,7 @@ export default function App() {
             📋 General Eligibility Requirements (All Programmes)
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {GENERAL_REQUIREMENTS.map((requirement, index) => (
+            {GENERAL_REQUIREMENTS.map(requirement => (
               <div key={requirement} className="bg-slate-800/40 rounded-xl p-3 border border-slate-700/50">
                 
                 <p className="text-xs text-slate-200 leading-relaxed">{requirement}</p>
